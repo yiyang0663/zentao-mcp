@@ -10,8 +10,8 @@ param(
 )
 
 $ErrorActionPreference = 'Stop'
-$Version = '1.2.0'
-$DefaultPackageUrl = 'https://github.com/yiyang0663/zentao-mcp/releases/download/v1.2.0/zentao-mcp-windows.zip'
+$Version = '1.2.1'
+$DefaultPackageUrl = 'https://github.com/yiyang0663/zentao-mcp/releases/download/v1.2.1/zentao-mcp-windows.zip'
 
 function Get-FirstCommand {
     param([string[]]$Names)

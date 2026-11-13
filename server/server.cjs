@@ -163,6 +163,15 @@ class ZentaoSession {
       if (/f=login/.test(text)) {
         throw new Error('禅道登录态丢失且重登失败：请检查账号密码');
       }
+      // 禅道旧版的写接口成功时返回 HTML 跳转脚本，而不是 JSON。
+      // 这类响应代表操作已完成，不能被当成接口失败。
+      const redirect = text.match(/parent\.location\s*=\s*['"]([^'"]+)['"]/i);
+      if (redirect && !/SQLSTATE|ERROR:/i.test(text)) {
+        return {
+          status: 'success',
+          data: { redirect: redirect[1] },
+        };
+      }
       throw new Error(`禅道返回 HTML 而非 JSON（${module}/${method}），可能页面不存在`);
     }
 

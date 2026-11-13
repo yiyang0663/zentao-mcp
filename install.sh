@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-VERSION="1.1.0"
+VERSION="1.2.1"
 INSTALL_DIR="${ZENTAO_MCP_INSTALL_DIR:-${XDG_DATA_HOME:-$HOME/.local/share}/zentao-mcp}"
 CONFIG_DIR="${ZENTAO_MCP_CONFIG_DIR:-${XDG_CONFIG_HOME:-$HOME/.config}/zentao-mcp}"
 BIN_DIR="${ZENTAO_MCP_BIN_DIR:-${XDG_BIN_HOME:-$HOME/.local/bin}}"
