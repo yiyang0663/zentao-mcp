@@ -4,11 +4,11 @@
 
 ## 给使用者的最新安装方式
 
-发布 `release/zentao-mcp-installer.sh` 后，使用者复制下面命令，把其中的下载地址替换成实际的文件服务器或 GitLab Release 地址：
+发布 `release/zentao-mcp-installer.sh` 后，macOS/Linux 使用者复制下面命令，把其中的下载地址替换成实际的文件服务器或 GitHub Release 地址：
 
 ```bash
 set -e
-INSTALLER_URL='https://github.com/yiyang0663/zentao-mcp/releases/download/v1.1.0/zentao-mcp-installer.sh'
+INSTALLER_URL='https://你的文件服务器/zentao-mcp-installer.sh'
 INSTALLER_FILE="$(mktemp "${TMPDIR:-/tmp}/zentao-mcp-installer.XXXXXX.sh")"
 trap 'rm -f "$INSTALLER_FILE"' EXIT
 curl --fail --location "$INSTALLER_URL" -o "$INSTALLER_FILE"
@@ -40,6 +40,34 @@ codex mcp get zentao
 ```
 
 如果电脑没有安装 Codex CLI，安装器仍会生成 `codex-mcp.toml` 配置片段；也可以把启动命令直接配置到其他支持 stdio MCP 的客户端。
+
+## Windows 原生安装
+
+Windows 使用者下载 `install.ps1`，在 PowerShell 中执行：
+
+```powershell
+$installerUrl = 'https://github.com/yiyang0663/zentao-mcp/releases/download/v1.2.0/install.ps1'
+$installerFile = Join-Path $env:TEMP 'zentao-mcp-install.ps1'
+Invoke-WebRequest -Uri $installerUrl -OutFile $installerFile
+Unblock-File $installerFile
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File $installerFile
+```
+
+Windows 安装器会下载 `zentao-mcp-windows.zip`，检查 Node.js 18 或更高版本，询问禅道地址、账号和密码，并生成：
+
+```text
+%LOCALAPPDATA%\zentao-mcp\zentao-mcp.ps1
+%LOCALAPPDATA%\zentao-mcp\zentao-mcp.cmd
+%APPDATA%\zentao-mcp\credentials.xml
+```
+
+密码使用当前 Windows 用户的 DPAPI 加密后保存，不会写入 GitHub 或 Codex 配置文件。安装器检测到 Codex CLI 时会自动执行：
+
+```powershell
+codex mcp add zentao -- powershell.exe -NoLogo -NoProfile -ExecutionPolicy Bypass -File "$env:LOCALAPPDATA\zentao-mcp\zentao-mcp.ps1"
+```
+
+重复安装会保留已有密码：地址、账号或密码提示直接回车即可沿用已有值。没有 Codex CLI 时，安装器会打印手动注册命令。
 
 安装过程中会询问：
 
@@ -106,6 +134,8 @@ command = "/Users/你的用户名/.local/bin/zentao-mcp"
 - 目标电脑能够访问禅道服务器（内网需要连接公司网络或 VPN）
 - 使用者拥有自己的禅道账号
 
+Windows 原生安装还需要 PowerShell 5.1 或更高版本。Windows 10/11 通常已经包含 PowerShell 5.1；PowerShell 7 也可以使用同一个安装器。
+
 ## 生成发布文件
 
 在本目录执行：
@@ -117,11 +147,13 @@ bash scripts/build-installer.sh
 生成结果位于 `release/`：
 
 - `zentao-mcp-installer.sh`：单文件安装器，适合放到 GitLab Release、公司文件服务器或静态文件服务器
+- `install.ps1`：Windows PowerShell 安装器
+- `zentao-mcp-windows.zip`：Windows MCP 服务和启动脚本
 - `zentao-mcp.tar.gz`：源码和依赖归档，适合留档或离线分发
 
 发布时只需要提供 `zentao-mcp-installer.sh` 的下载链接即可。
 
-安装器版本当前为 `1.1.0`。如果已经安装过旧版本，重新执行同一个下载链接即可覆盖服务文件；如果 Codex 中已经存在名为 `zentao` 的旧配置，安装器会保留它并打印切换命令，避免覆盖其他 MCP 配置。
+安装器版本当前为 `1.2.0`。如果已经安装过旧版本，重新执行对应平台的安装器即可覆盖服务文件；如果 Codex 中已经存在名为 `zentao` 的旧配置，安装器会保留它并打印切换命令，避免覆盖其他 MCP 配置。
 
 ## 安全要求
 

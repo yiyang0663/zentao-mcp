@@ -6,8 +6,19 @@ RELEASE_DIR="$ROOT_DIR/release"
 WORK_DIR="$(mktemp -d "${TMPDIR:-/tmp}/zentao-mcp-build.XXXXXX")"
 trap 'rm -rf "$WORK_DIR"' EXIT
 
+if ! command -v zip >/dev/null 2>&1; then
+  echo '未找到 zip 命令，无法生成 Windows 安装包。' >&2
+  exit 1
+fi
+
 mkdir -p "$RELEASE_DIR" "$WORK_DIR/package"
 cp -R "$ROOT_DIR/server" "$WORK_DIR/package/"
+cp -R "$ROOT_DIR/windows" "$WORK_DIR/package/"
+
+WINDOWS_ZIP="$RELEASE_DIR/zentao-mcp-windows.zip"
+rm -f "$WINDOWS_ZIP"
+(cd "$WORK_DIR" && zip -qr "$WINDOWS_ZIP" package)
+cp "$ROOT_DIR/install.ps1" "$RELEASE_DIR/install.ps1"
 
 tar -czf "$RELEASE_DIR/zentao-mcp.tar.gz" -C "$WORK_DIR" package
 
@@ -18,4 +29,6 @@ chmod 755 "$RELEASE_DIR/zentao-mcp-installer.sh"
 
 printf '已生成：%s\n' "$RELEASE_DIR/zentao-mcp-installer.sh"
 printf '已生成：%s\n' "$RELEASE_DIR/zentao-mcp.tar.gz"
+printf '已生成：%s\n' "$RELEASE_DIR/install.ps1"
+printf '已生成：%s\n' "$WINDOWS_ZIP"
 printf '安装器大小：%s\n' "$(du -h "$RELEASE_DIR/zentao-mcp-installer.sh" | awk '{print $1}')"

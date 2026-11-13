@@ -1,0 +1,33 @@
+name: Windows installer test
+
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  smoke:
+    name: ${{ matrix.shell }} / Node ${{ matrix.node }}
+    runs-on: windows-2022
+    strategy:
+      fail-fast: false
+      matrix:
+        shell: [powershell, pwsh]
+        node: ['18.x', '20.x', '22.x']
+    defaults:
+      run:
+        shell: ${{ matrix.shell }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node }}
+          cache: npm
+          cache-dependency-path: server/package-lock.json
+      - name: Install server dependencies
+        run: npm ci --prefix server
+      - name: Build Windows package
+        run: .\scripts\build-windows-package.ps1 -Root $pwd -Output "$env:RUNNER_TEMP\zentao-mcp-windows.zip"
+      - name: Run Windows smoke test
+        run: .\tests\windows-smoke.ps1 -InstallScript "$pwd\install.ps1" -PackagePath "$env:RUNNER_TEMP\zentao-mcp-windows.zip" -ToolsListScript "$pwd\tests\mcp-tools-list.cjs" -ErrorSmokeScript "$pwd\tests\mcp-error-smoke.cjs"
