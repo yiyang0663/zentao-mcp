@@ -4,11 +4,11 @@
 
 ## 给使用者的最新安装方式
 
-发布 `release/zentao-mcp-installer.sh` 后，macOS/Linux 使用者复制下面命令，把其中的下载地址替换成实际的文件服务器或 GitHub Release 地址：
+macOS/Linux 使用者可以直接执行下面的安装命令：
 
 ```bash
 set -e
-INSTALLER_URL='https://你的文件服务器/zentao-mcp-installer.sh'
+INSTALLER_URL='https://github.com/yiyang0663/zentao-mcp/releases/download/v1.2.0/zentao-mcp-installer.sh'
 INSTALLER_FILE="$(mktemp "${TMPDIR:-/tmp}/zentao-mcp-installer.XXXXXX.sh")"
 trap 'rm -f "$INSTALLER_FILE"' EXIT
 curl --fail --location "$INSTALLER_URL" -o "$INSTALLER_FILE"
@@ -151,7 +151,11 @@ bash scripts/build-installer.sh
 - `zentao-mcp-windows.zip`：Windows MCP 服务和启动脚本
 - `zentao-mcp.tar.gz`：源码和依赖归档，适合留档或离线分发
 
-发布时只需要提供 `zentao-mcp-installer.sh` 的下载链接即可。
+GitHub Release 下载地址：
+
+- macOS/Linux：`https://github.com/yiyang0663/zentao-mcp/releases/download/v1.2.0/zentao-mcp-installer.sh`
+- Windows：`https://github.com/yiyang0663/zentao-mcp/releases/download/v1.2.0/install.ps1`
+- Windows 离线包：`https://github.com/yiyang0663/zentao-mcp/releases/download/v1.2.0/zentao-mcp-windows.zip`
 
 安装器版本当前为 `1.2.0`。如果已经安装过旧版本，重新执行对应平台的安装器即可覆盖服务文件；如果 Codex 中已经存在名为 `zentao` 的旧配置，安装器会保留它并打印切换命令，避免覆盖其他 MCP 配置。
 
